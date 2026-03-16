@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # Frontend service
+  # It only resides in the frontend_net
+  frontend:
+    image: alpine
+    container_name: frontend-service
+    command: sleep infinity
+    networks:
+      - frontend_net
+
+  # Backend service
+  # It bridges frontend_net and backend_net
+  # This allows it to talk to both frontend and db
+  backend:
+    image: alpine
+    container_name: backend-service
+    command: sleep infinity
+    networks:
+      - frontend_net
+      - backend_net
+
+  # Database service
+  # It only resides in the backend_net
+  # It is isolated from the frontend
+  db:
+    image: alpine
+    container_name: db-service
+    command: sleep infinity
+    networks:
+      - backend_net
+
+networks:
+  frontend_net:
+    driver: bridge
+  backend_net:
+    driver: bridge
+    # To further isolate, we could make it internal: true
+    # but that would prevent it from reaching the internet.
+    # For this demonstration, bridge is sufficient.
