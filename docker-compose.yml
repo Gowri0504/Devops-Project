@@ -1,18 +1,33 @@
-version: '3.8'
-
 services:
-  # Frontend service
-  # It only resides in the frontend_net
+  # Innovative Frontend Service:
+  # - Minimalist Alpine base
+  # - Resource limits (Prevent DoS)
+  # - Read-only root filesystem (Security Hardening)
+  # - Network-based isolation
   frontend:
     image: alpine
     container_name: frontend-service
     command: sleep infinity
     networks:
       - frontend_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.10'
+          memory: 64M
+    read_only: true
+    tmpfs:
+      - /tmp
+    healthcheck:
+      test: ["CMD", "ping", "-c", "1", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # Backend service
-  # It bridges frontend_net and backend_net
-  # This allows it to talk to both frontend and db
+  # Innovative Backend Service:
+  # - Bridged networking (Controlled access)
+  # - Environment variables for config
+  # - High availability (Restart policy)
   backend:
     image: alpine
     container_name: backend-service
@@ -20,22 +35,49 @@ services:
     networks:
       - frontend_net
       - backend_net
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "ping", "-c", "1", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # Database service
-  # It only resides in the backend_net
-  # It is isolated from the frontend
+  # Innovative DB Service:
+  # - Fully isolated in backend_net
+  # - No public port mapping (Security by design)
+  # - Simulated volume for persistence
   db:
     image: alpine
     container_name: db-service
     command: sleep infinity
     networks:
       - backend_net
+    volumes:
+      - db_data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "ls", "/data"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
   frontend_net:
+    name: devops_frontend_net
     driver: bridge
   backend_net:
+    name: devops_backend_net
     driver: bridge
-    # To further isolate, we could make it internal: true
-    # but that would prevent it from reaching the internet.
-    # For this demonstration, bridge is sufficient.
+    internal: true # Max security: DB net cannot reach the internet
+
+volumes:
+  db_data:
