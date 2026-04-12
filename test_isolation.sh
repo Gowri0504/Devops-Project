@@ -9,9 +9,9 @@ echo "--------------------------------------------------------"
 
 # 1. Test Backend -> Database (Should SUCCEED)
 echo "TEST 1: Backend to Database (Internal Network: db-network)"
-docker exec track-placement-backend mongosh --host db --eval "db.adminCommand('ping')" > /dev/null 2>&1
+docker exec track-placement-backend nc -zv db 27017 > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-    echo "✅ SUCCESS: Backend reached Database."
+    echo "✅ SUCCESS: Backend reached Database on port 27017."
 else
     echo "❌ FAILED: Backend could not reach Database."
 fi
@@ -20,17 +20,11 @@ echo ""
 
 # 2. Test Frontend -> Backend (Should SUCCEED)
 echo "TEST 2: Frontend to Backend (Internal Network: app-network)"
-docker exec track-placement-frontend curl -s http://backend:3000/health > /dev/null 2>&1
+docker exec track-placement-frontend nc -zv backend 3000 > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-    echo "✅ SUCCESS: Frontend reached Backend API."
+    echo "✅ SUCCESS: Frontend reached Backend API on port 3000."
 else
-    # Try the root if health is not found
-    docker exec track-placement-frontend curl -s http://backend:3000/ > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        echo "✅ SUCCESS: Frontend reached Backend Root."
-    else
-        echo "❌ FAILED: Frontend could not reach Backend."
-    fi
+    echo "❌ FAILED: Frontend could not reach Backend."
 fi
 
 echo ""
@@ -47,5 +41,5 @@ else
 fi
 
 echo "--------------------------------------------------------"
-echo "🎯 NETWORK TESTS COMPLETE"
+echo "🎯 ALL NETWORK TESTS COMPLETE"
 echo "--------------------------------------------------------"
