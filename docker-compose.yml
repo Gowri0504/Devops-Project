@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # 1. FRONTEND TIER (Nginx + React App)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: track-placement-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+  # 2. BACKEND TIER (Node.js API)
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: track-placement-backend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://db:27017/track-placement
+      - PORT=3000
+    networks:
+      - app-network
+      - db-network
+    depends_on:
+      - db
+
+  # 3. DATABASE TIER (MongoDB)
+  db:
+    image: mongo:latest
+    container_name: track-placement-db
+    restart: unless-stopped
+    volumes:
+      - db-data:/data/db
+    networks:
+      - db-network
+    # DATABASE IS ISOLATED - NO PORTS EXPOSED TO HOST
+
+networks:
+  # Multi-tier Network Isolation
+  app-network:
+    driver: bridge
+  db-network:
+    driver: bridge
+
+volumes:
+  # Secure Data Persistence
+  db-data:
+    driver: local
