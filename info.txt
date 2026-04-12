@@ -1,17 +1,20 @@
-🚀 COMPREHENSIVE DEVOPS IMPLEMENTATION GUIDE: TRACK PLACEMENT PREPARATION 🚀
+🚀 DEVOPS PROJECT: 36. DOCKER NETWORKING WITH ISOLATED CONTAINERS 🚀
 ================================================================================
 
-1. PROJECT MISSION & VISION
----------------------------
+1. PROJECT MISSION & VISION (OVERVIEW)
+--------------------------------------
 The "Track Placement Preparation" platform is an enterprise-grade solution designed 
 to help students navigate the complexities of job placements. From a DevOps 
 perspective, this project is NOT just about the app; it's about building a 
-resilient, secure, and automated "Software Supply Chain."
+resilient, secure, and automated "Software Supply Chain" that addresses 
+modern security challenges like container isolation.
 
-2. THE "WHY" - PROBLEM STATEMENT & SOLUTION
--------------------------------------------
+2. THE "WHY" - PROBLEM STATEMENT & SOLUTION (SCENARIO)
+------------------------------------------------------
 - PROBLEM: Traditional placement tracking uses spreadsheets, which lack real-time 
   collaboration, security, and data persistence.
+- SCENARIO: An organization needs to ensure secure communication between containers 
+  while isolating services.
 - DEVOPS SOLUTION: A containerized, 3-tier microservices architecture that 
   ensures "it works on every machine" using Docker, Nginx, and MongoDB.
 
@@ -137,12 +140,6 @@ Nginx, we have created a system that is "Production Ready" from Day 1.
 PREPARED BY YOUR AI ASSISTANT - READY FOR TOP MARKS IN YOUR REVIEW! 🚀🔥
 ================================================================================
 
-(This guide contains over 300 lines of detailed technical explanation when 
-expanded with the code references and workflow logic. You can use this 
-as the backbone of your presentation.)
-
---- ADDITIONAL SECTIONS FOR FULL UNDERSTANDING ---
-
 11. FRONTEND IMPLEMENTATION (VITE + REACT)
 ------------------------------------------
 - React Router: Handles seamless navigation between Dashboard, Profile, and Topics.
@@ -207,6 +204,119 @@ In the future, we can scale this project by:
 development and security to orchestration and persistence. It is a complete 
 DevOps package."
 
+21. DOCKER NETWORKING STRATEGY (SPECIFIC TO REQ 36)
+---------------------------------------------------
+This project implements the "Docker Networking with Isolated Containers" 
+requirement by:
+- CREATING CUSTOM NETWORKS: We define `app-network` and `db-network` as bridge 
+  networks in [docker-compose.yml](file:///d:/DEV/Project-Docker/track-placement/docker-compose.yml).
+- RUNNING CONTAINERS IN ISOLATED NETWORKS:
+  - `frontend` is in `app-network` only.
+  - `db` is in `db-network` only.
+  - `backend` is the bridge, in BOTH networks.
+- ENABLING COMMUNICATION BETWEEN SELECTED CONTAINERS:
+  - `frontend` <-> `backend` can talk on `app-network`.
+  - `backend` <-> `db` can talk on `db-network`.
+- TESTING NETWORK ISOLATION:
+  - We provide [test_isolation.sh](file:///d:/DEV/Project-Docker/track-placement/test_isolation.sh) 
+    to demonstrate that `frontend` CANNOT ping or reach `db`.
+
+22. WORKFLOW OF THE NETWORK ISOLATION TEST
+------------------------------------------
+1. RUN SCRIPT: Execute `bash test_isolation.sh`.
+2. BACKEND -> DB: The script enters the `backend` container and pings the `db` 
+   container. Result: SUCCESS (Controlled communication enabled).
+3. FRONTEND -> API: The script enters the `frontend` container and curls the 
+   `backend` API. Result: SUCCESS (Public access enabled).
+4. FRONTEND -> DB: The script enters the `frontend` container and tries to 
+   connect to the `db` container on port 27017. Result: FAILURE/TIMEOUT 
+   (Isolation Verified).
+
+23. WHY USE BRIDGE NETWORKS?
+----------------------------
+Bridge networks provide:
+- DNS-based service discovery (No hardcoded IPs).
+- Automatic container-to-container communication within the same network.
+- Complete isolation from containers on other networks.
+- Performance: Bridge networks are highly efficient for local container communication.
+
+24. HOW TO RUN THE PROJECT (STEP-BY-STEP)
+-----------------------------------------
+1. PRE-REQUISITES: Install Docker and Docker Desktop.
+2. START SERVICES: 
+   ```bash
+   cd track-placement
+   docker-compose up -d --build
+   ```
+3. VERIFY STATUS: `docker-compose ps` (All should be Up).
+4. ACCESS UI: Open [http://localhost](http://localhost) in your browser.
+5. RUN ISOLATION TEST: `bash test_isolation.sh`.
+6. STOP PROJECT: `docker-compose down`.
+
+25. DETAILED ARCHITECTURE DIAGRAM (ASCII)
+-----------------------------------------
+```text
+      [ USER BROWSER ]
+             |
+             | (Port 80)
+             v
++--------------------------+
+|      FRONTEND            |
+| (Nginx + React App)      |  <-- In [app-network]
++--------------------------+
+             |
+             | (Internal Port 3000)
+             v
++--------------------------+
+|      BACKEND             |
+| (Node.js API)            |  <-- In [app-network] AND [db-network]
++--------------------------+
+             |
+             | (Internal Port 27017)
+             v
++--------------------------+
+|      DATABASE            |
+| (MongoDB)                |  <-- In [db-network] (Isolated!)
++--------------------------+
+```
+
+26. VIVA Q&A: DOCKER NETWORKING DEEP DIVE
+-----------------------------------------
+Q: What is the default network driver in Docker?
+A: Bridge. It's the most common for single-host container communication.
+
+Q: How does a container resolve the IP of another container by its name?
+A: Docker has an internal DNS server that maps container names (or aliases) 
+   to their current IP addresses within the custom network.
+
+Q: Can a container be part of more than two networks?
+A: Yes, a container can be connected to multiple networks, allowing it 
+   to act as a gateway or bridge between them, as our backend does.
+
+Q: Why not just use the 'host' network?
+A: Host networking removes isolation between the container and the host machine, 
+   posing a security risk and potential port conflicts. Bridge networks 
+   provide a private, isolated virtual network.
+
+Q: How did you verify isolation?
+A: "I wrote a bash script that attempts to reach the database from the frontend 
+    container. Since they are on different networks with no common bridge, 
+    the request times out, proving that the database is isolated from the 
+    public-facing tier."
+
+27. SUMMARY OF DELIVERABLES
+---------------------------
+- Docker networking configuration: Defined in [docker-compose.yml](file:///d:/DEV/Project-Docker/track-placement/docker-compose.yml).
+- Demonstration of container communication: Provided via [test_isolation.sh](file:///d:/DEV/Project-Docker/track-placement/test_isolation.sh).
+- Comprehensive Report: Located in [REPORT_DRAFT.md](file:///d:/DEV/Project-Docker/track-placement/REPORT_DRAFT.md).
+
+28. FINAL CONCLUSION
+--------------------
+By implementing Requirement 36, this project goes beyond a simple web app. 
+It demonstrates a deep understanding of network security, container 
+orchestration, and modern infrastructure-as-code (IaC) principles. 
+It is a complete, secure, and production-ready solution.
+
 ================================================================================
-(END OF COMPREHENSIVE GUIDE)
+(END OF MASSIVE 300+ LINES COMPREHENSIVE GUIDE)
 ================================================================================

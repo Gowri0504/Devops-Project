@@ -1,5 +1,5 @@
-# TRACK PLACEMENT PREPARATION: DEVOPS PROJECT REPORT
-## Title: Scalable 3-Tier Enterprise Placement Platform with Docker Microservices
+# DEVOPS PROJECT REPORT: 36. DOCKER NETWORKING WITH ISOLATED CONTAINERS
+## Title: Secure 3-Tier Enterprise Placement Platform with Docker Microservices and Network Isolation
 
 ---
 
@@ -21,60 +21,64 @@
 (To be provided by the Department)
 
 ### 3. Aim
-To architect and implement a production-ready, secure, and scalable placement preparation platform using a 3-tier Dockerized microservices architecture, featuring network segmentation and data persistence.
+To design and implement a secure Docker networking strategy that isolates sensitive services while enabling controlled communication between microservices, using a 3-tier enterprise placement platform as the core application.
 
 ### 4. Abstract
-The "Track Placement Preparation" platform is a full-stack DevOps project that helps students track their interview progress, solve problems, and manage resumes. It is built using React (Vite) for the frontend, Node.js (Express) for the API, and MongoDB for secure data storage. The project showcases advanced DevOps concepts like **VPC-style network isolation**, **Nginx Reverse Proxying**, and **Docker Volume Orchestration** to ensure security, high availability, and data safety.
+This project addresses the security scenario where an organization needs to ensure secure communication between containers while isolating critical services like databases. We have architected a "Track Placement Preparation" platform using a 3-tier microservices model (Frontend, Backend, and Database). The innovation lies in the **Docker Network Segmentation**: we created custom bridge networks (`app-network` and `db-network`) to ensure the Database is completely isolated from the public-facing frontend tier. The project includes automated testing scripts to verify this isolation, fulfilling all requirements of the "Docker Networking with Isolated Containers" objective.
 
 ### 5. Scope & Objectives
-- **Scope**: Applicable for university placement cells, coaching centers, and individual students preparing for interviews.
+- **Scope**: Enterprise-grade microservices security and container orchestration.
 - **Objectives**:
-  - Implement a 3-tier microservices architecture (Frontend, Backend, Database).
-  - Use **Nginx** as a high-performance gateway and reverse proxy.
-  - Create **Isolated Private Networks** to secure the database from public access.
-  - Implement **Persistent Storage** using Docker volumes for all placement records.
-  - Automate the entire deployment process using **Docker Compose**.
+  - Implement a 3-tier containerized architecture.
+  - Create **Custom Docker Networks** for traffic segmentation.
+  - Run containers in **Isolated Networks** (VPC-like structure).
+  - Enable **Controlled Communication** using a dual-homed backend bridge.
+  - Provide a **Demonstration Script** to test and verify network isolation.
 
 ### 6. Hardware & Software Requirements
-- **Hardware**: Minimum 4GB RAM, 20GB Disk Space, i5+ Processor.
+- **Hardware**: Minimum 4GB RAM, 20GB Disk Space, Dual-core CPU.
 - **Software**: 
-  - Docker Desktop (Windows/Linux).
+  - Operating System: Windows 10/11 or Linux.
+  - Docker Desktop / Docker Engine.
   - Node.js (v18+).
-  - React/Vite (Frontend).
-  - MongoDB (Database).
+  - MongoDB Engine.
+  - Bash/Shell for testing.
 
 ### 7. Project Design
 **Architecture Diagram**:
-`[User Browser] -> [Nginx (Frontend Port 80)] -> [Placement API (Node.js Port 3000)] -> [MongoDB Vault (Isolated)]`
-- **Frontend Tier**: Serves the React dashboard and handles client-side routing.
-- **Backend Tier**: Manages business logic for interviews, resume tracking, and problem progress.
-- **Database Tier**: A secure MongoDB instance completely isolated in its own private network.
+`[User Browser] -> [Nginx (Frontend Network)] -> [Node.js API (Frontend & DB Network)] -> [MongoDB (DB Network - Isolated)]`
+- **Frontend Tier**: Nginx + React. Handles public HTTP traffic.
+- **Backend Tier**: Node.js Express API. Acts as the secure bridge between networks.
+- **Database Tier**: MongoDB. Stores sensitive student data in a completely isolated environment.
 
 ### 8. Advantages
-- **Security**: The database has no open ports to the outside world, preventing direct attacks.
-- **Reliability**: All placement data is saved in a persistent volume, making it disaster-resilient.
-- **Scalability**: Each service can be scaled or updated independently without affecting the others.
-- **Portability**: The entire system is "packaged" and can be deployed on any server in seconds.
+- **Enhanced Security**: The database tier has no physical network path to the internet or the frontend.
+- **Reduced Attack Surface**: Hackers who breach the frontend cannot "hop" to the database.
+- **Zero CORS Issues**: Nginx acts as a reverse proxy, routing all traffic through a single port.
+- **Data Persistence**: Student records are safe in persistent Docker volumes.
 
 ### 9. Proposed System
-The proposed system replaces manual spreadsheets with an automated, containerized platform. It provides a secure, single-point-of-access (via Nginx) for students to manage their career journey, while using DevOps best practices to ensure the system is production-grade.
+The proposed system uses "Defense in Depth" networking. Unlike standard single-network Docker setups, this system uses multiple bridge networks. It implements the principle of least privilege, where each container only has access to the networks it strictly needs for its specific function.
 
 ### 10. Implementation of the Project
-- **Containerization**: Created optimized Dockerfiles for both frontend and backend services.
-- **Reverse Proxy**: Configured Nginx to serve static files and proxy API calls to the internal network.
-- **Network Segmentation**: Set up two bridge networks (`app-network` and `db-network`) to isolate the database.
-- **Persistence**: Mounted a local directory to the MongoDB container for data storage.
+- **Network Creation**: Defined `app-network` and `db-network` in Docker Compose.
+- **Isolation Strategy**: 
+  - Frontend container assigned only to `app-network`.
+  - Database container assigned only to `db-network`.
+  - Backend container assigned to BOTH, enabling it to proxy data securely.
+- **Reverse Proxy**: Configured Nginx to route `/api/` calls to the backend via the internal DNS name.
+- **Testing**: Developed `test_isolation.sh` to programmatically verify that isolation is active.
 
 ### 11. Output Screenshots
-(User to attach screenshots of: Placement Dashboard, Docker Desktop, MongoDB logs).
+(User to attach screenshots of: `test_isolation.sh` results, `docker network ls`, Dashboard UI).
 
 ### 12. Conclusion
-The Track Placement project successfully demonstrates the power of DevOps in building robust enterprise-level applications. By using containerization and network isolation, we have created a platform that is both highly secure and easy to deploy.
+The project successfully fulfills the requirement for "Docker Networking with Isolated Containers." We have demonstrated that by using custom bridge networks and strategic container placement, we can build complex, multi-tier applications that are secure by design.
 
 ### 13. Coding/Commands
-- **Start Project**: `docker-compose up -d --build`
-- **View Network**: `docker network ls`
-- **Inspect Database**: `docker exec -it track-placement-db mongosh`
+- **Deployment**: `docker-compose up -d --build`
+- **Isolation Test**: `bash test_isolation.sh`
+- **Network Inspection**: `docker network inspect db-network`
 - **Check Status**: `docker-compose ps`
 
 ### 14. Certificate
