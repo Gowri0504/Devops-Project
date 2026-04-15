@@ -1,3 +1,22 @@
+36. Docker Networking with Isolated Containers
+
+Scenario
+An organization needs to ensure secure communication between containers while isolating services.
+
+Objective
+Implement Docker networking strategies to isolate containers and control communication.
+
+Requirements
+* Create custom Docker networks.
+* Run containers in isolated networks.
+* Enable communication between selected containers.
+* Test network isolation.
+
+Deliverables
+* Docker networking configuration
+* Demonstration of container communication.
+
+
 🚀 DEVOPS PROJECT: 36. DOCKER NETWORKING WITH ISOLATED CONTAINERS 🚀
 ================================================================================
 
